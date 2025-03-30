@@ -8,26 +8,32 @@ import java.util.List;
 
 public class TeacherDAO {
     public void addTeacher(Teacher teacher) {
-        String sql = "INSERT INTO Teacher (teacher_id,first_name, last_name, subject) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO Teacher (first_name, last_name, subject) VALUES (?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, teacher.getFirstName());
             stmt.setString(2, teacher.getLastName());
             stmt.setString(3, teacher.getSubject());
             stmt.executeUpdate();
+
+            // Get the generated teacher_id if needed
+            ResultSet rs = stmt.getGeneratedKeys();
+            if (rs.next()) {
+                teacher.setTeacherId(rs.getInt(1));
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
     public void updateTeacher(Teacher teacher) {
-        String sql = "UPDATE Teacher SET first_name=?, last_name=?, subject=? WHERE teacher_id=?";
+        String sql = "UPDATE Teacher SET first_name = ?, last_name = ?, subject = ? WHERE teacher_id = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, teacher.getFirstName());
             stmt.setString(2, teacher.getLastName());
             stmt.setString(3, teacher.getSubject());
-            stmt.setInt(4, teacher.getTeacherId());
+            stmt.setInt(4, teacher.getTeacherId()); // WHERE condition
             stmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();

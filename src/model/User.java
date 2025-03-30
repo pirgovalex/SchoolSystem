@@ -1,6 +1,7 @@
 package model;
 
 public class User {
+
     private int userId;
     private String username;
     private String password;
@@ -42,4 +43,5 @@ public class User {
     public void setRole(String role) {
         this.role = role;
     }
+
 }
