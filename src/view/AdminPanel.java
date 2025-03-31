@@ -10,6 +10,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,16 +65,32 @@ public class AdminPanel extends JPanel {
     }
 
     private void addUser() {
-        int newId = users.size() + 1;
-        User user = new User(newId, txtUsername.getText(), txtPassword.getText(), txtRole.getText().toUpperCase());
-        String insert =  "INSERT INTO USERS VALUES (?, ?, ?)";
-        try(Connection conn = DatabaseConnection.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(insert)){
-            stmt.setInt(1,user.getUserId());
-            stmt.setString(2,user.getUsername());
-            stmt.setString(3,user.getPassword());
+        String catchID = "SELECT MAX(ID) AS maximum FROM USERS";
+        int maxId = 0;
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(catchID);
+             ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+            maxId = rs.getInt("maximum");
+            }
+            maxId++;
+
+
+
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        catch (SQLException e) {
+        int newId = users.size() + 1;
+        User user = new User(maxId, txtUsername.getText(), txtPassword.getText(), txtRole.getText().toUpperCase());
+        String insert = "INSERT INTO USERS VALUES (?, ?, ?,?)";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(insert)) {
+            stmt.setInt(1, user.getUserId());
+            stmt.setString(2, user.getUsername());
+            stmt.setString(3, user.getPassword());
+            stmt.setString(4, user.getRole());
+            stmt.executeUpdate();
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         users.add(user);

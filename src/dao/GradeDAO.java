@@ -80,7 +80,7 @@ public class GradeDAO {
         // -----------------------------------------
         String sql = "SELECT g.* FROM grades g " +
                 "JOIN students s ON g.student_id = s.user_id " +
-                "JOIN teacher t ON g.teacher_id = t.user_id " +  // Changed to user_id since teacher is linked to users
+                "JOIN teacher t ON g.teacher_id = t.user_id " +  // teacher is linked to users
                 "WHERE CONCAT(s.first_name, ' ', s.last_name) LIKE ? " +
                 "AND t.subject LIKE ?";
 
@@ -104,4 +104,35 @@ public class GradeDAO {
         }
         return grades;
     }
+    public List<Grade> searchGradesByTeacher(String teacherName, String subject) {
+        List<Grade> grades = new ArrayList<>();
+        String sql = "SELECT g.* FROM grades g " +
+                "INNER JOIN teacher t ON g.teacher_id = t.teacher_id " +
+                "WHERE CONCAT(t.first_name, ' ', t.last_name) = ? " +
+                "AND g.subject_id = (SELECT id FROM subjects WHERE name = ?)";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1,  teacherName );
+            stmt.setString(2, subject );
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                Grade grade = new Grade(
+                        rs.getInt("id"),
+                        rs.getInt("student_id"),
+                        rs.getInt("teacher_id"),
+                        rs.getInt("subject_id"),
+                        rs.getDouble("grade"),
+                        rs.getDate("date_given"),
+                        rs.getString("remarks")
+                );
+                grades.add(grade);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return grades;
+    }
+
 }

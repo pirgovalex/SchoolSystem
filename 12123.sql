@@ -47,7 +47,7 @@ CREATE TABLE grades (
     FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE CASCADE
 );
-
+describe users;
 -- 7. Добавяне на примерни потребители
 INSERT INTO users (username, password, role) VALUES 
 ('admin', 'admin123', 'ADMIN'),
@@ -86,8 +86,29 @@ subject varchar  (262));
 INSERT INTO TEACHER VALUES (1,"Aleks", "P" , "Informatics"),
 (2,"Aleks","M","Special Pedagogy"),(3,"Plamen","Pirgov","Veterinarnost");
 alter table teacher ADD FOREIGN KEY teacher(subject)  REFERENCES  subjects(name);
-
-
+ALTER TABLE Teacher MODIFY teacher_id INT AUTO_INCREMENT;
+SELECT g.* FROM grades g 
+                INNER JOIN teacher t ON g.teacher_id = t.teacher_id 
+                WHERE t.first_name="Matematiko" and t.last_name = "M"
+                AND g.subject_id = (SELECT id FROM subjects WHERE name = "Mathematics" );
+                
+                SELECT g.* FROM grades g 
+                 INNER JOIN teacher t ON g.teacher_id = t.teacher_id 
+                 WHERE CONCAT(t.first_name, ' ', t.last_name) = "az a" 
+                 AND g.subject_id = (SELECT id FROM subjects WHERE name = "Mathematics");
+                 
+       SELECT g.* FROM grades g      
+       INNER JOIN teacher t ON g.teacher_id = t.teacher_id 
+       where t.first_name= "az"and t.last_name = "a"  ;
+select * from teacher;
+select * from grades;
+SELECT g.* FROM grades g 
+                INNER JOIN teacher t ON g.teacher_id = t.teacher_id 
+                WHERE t.teacher_id = 
+                (SELECT teacher_id 
+                from teacher 
+                where first_name = "az"
+                and last_name="a");
 -- Create students table linked to users table
 CREATE TABLE students (
     user_id INT PRIMARY KEY,
@@ -118,7 +139,7 @@ UPDATE teacher SET user_id = 2 WHERE first_name = 'Aleks' AND last_name = 'M';
 ALTER TABLE grades MODIFY teacher_id INT;
 UPDATE grades SET teacher_id = 2;
 ALTER TABLE grades MODIFY teacher_id INT NOT NULL;
-
+select * from subjects;
 -- 4. Add the foreign key
 ALTER TABLE grades ADD FOREIGN KEY (teacher_id) REFERENCES users(id) ON DELETE CASCADE;
 SELECT * FROM TEACHER ; SELECT * FROM USERS;
@@ -130,7 +151,9 @@ INSERT INTO TEACHER VALUES (4, "Matematiko", "M", "Mathematics", 18);
 
 INSERT INTO users (id, username, password, role) VALUES (18, 'teacherX', '12345', 'TEACHER');
 
+ALTER TABLE teacher ADD FOREIGN KEY (subject) REFERENCES subjects(name);
 
+select * from users;
 
 select * from students;
 select * from teacher;
